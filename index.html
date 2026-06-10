@@ -1,0 +1,640 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Table de sondes gasoil - MY Genesia</title>
+
+  <style>
+    :root {
+      --bg: #0b0f14;
+      --card: #151b23;
+      --card2: #1d2630;
+      --text: #f4f7fb;
+      --muted: #9aa7b5;
+      --accent: #38bdf8;
+      --accent2: #22c55e;
+      --danger: #ef4444;
+      --border: #2b3542;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+      background: linear-gradient(180deg, #071018, #0b0f14);
+      color: var(--text);
+      min-height: 100vh;
+    }
+
+    header {
+      padding: 22px 16px 12px;
+      text-align: center;
+      border-bottom: 1px solid var(--border);
+      background: rgba(11, 15, 20, 0.96);
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: 1.35rem;
+      letter-spacing: 0.5px;
+    }
+
+    .subtitle {
+      margin-top: 6px;
+      color: var(--muted);
+      font-size: 0.9rem;
+    }
+
+    main {
+      width: 100%;
+      max-width: 760px;
+      margin: 0 auto;
+      padding: 16px;
+    }
+
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      padding: 16px;
+      margin-bottom: 16px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.25);
+    }
+
+    label {
+      display: block;
+      color: var(--muted);
+      font-size: 0.9rem;
+      margin-bottom: 7px;
+    }
+
+    input, select, textarea, button {
+      width: 100%;
+      font-size: 1rem;
+      border-radius: 14px;
+      border: 1px solid var(--border);
+      padding: 13px;
+      background: var(--card2);
+      color: var(--text);
+      outline: none;
+    }
+
+    input:focus, select:focus, textarea:focus {
+      border-color: var(--accent);
+    }
+
+    textarea {
+      min-height: 150px;
+      resize: vertical;
+      font-family: monospace;
+      line-height: 1.4;
+    }
+
+    button {
+      border: none;
+      font-weight: 700;
+      cursor: pointer;
+      background: var(--accent);
+      color: #00111c;
+      margin-top: 10px;
+    }
+
+    button.secondary {
+      background: var(--card2);
+      color: var(--text);
+      border: 1px solid var(--border);
+    }
+
+    button.green {
+      background: var(--accent2);
+      color: #001407;
+    }
+
+    button.red {
+      background: var(--danger);
+      color: white;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 12px;
+    }
+
+    @media (min-width: 680px) {
+      .grid-2 {
+        grid-template-columns: 1fr 1fr;
+      }
+    }
+
+    .result {
+      text-align: center;
+      padding: 20px;
+      border-radius: 18px;
+      background: #071018;
+      border: 1px solid var(--border);
+      margin-top: 14px;
+    }
+
+    .liters {
+      font-size: 2.4rem;
+      font-weight: 900;
+      color: var(--accent2);
+      margin: 8px 0;
+    }
+
+    .small {
+      color: var(--muted);
+      font-size: 0.88rem;
+      line-height: 1.45;
+    }
+
+    .tank-list {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      margin-top: 10px;
+    }
+
+    .tank-item {
+      display: flex;
+      justify-content: space-between;
+      gap: 8px;
+      align-items: center;
+      padding: 12px;
+      border-radius: 14px;
+      background: var(--card2);
+      border: 1px solid var(--border);
+    }
+
+    .tank-name {
+      font-weight: 700;
+    }
+
+    .badge {
+      color: var(--muted);
+      font-size: 0.85rem;
+    }
+
+    .row-actions {
+      display: flex;
+      gap: 8px;
+    }
+
+    .row-actions button {
+      margin: 0;
+      padding: 9px;
+      font-size: 0.85rem;
+    }
+
+    .hidden {
+      display: none;
+    }
+
+    .notice {
+      background: rgba(56,189,248,0.1);
+      border: 1px solid rgba(56,189,248,0.35);
+      color: #d8f3ff;
+      padding: 12px;
+      border-radius: 14px;
+      font-size: 0.9rem;
+      line-height: 1.4;
+      margin-bottom: 12px;
+    }
+
+    footer {
+      text-align: center;
+      color: var(--muted);
+      font-size: 0.78rem;
+      padding: 20px 10px 35px;
+    }
+  </style>
+</head>
+
+<body>
+  <header>
+    <h1>Table de sondes gasoil</h1>
+    <div class="subtitle">MY Genesia · Calcul rapide par interpolation</div>
+  </header>
+
+  <main>
+    <section class="card">
+      <div class="notice">
+        Entre tes valeurs de table de sonde sous forme : <strong>hauteur;litres</strong><br>
+        Exemple : <strong>0;0</strong> puis <strong>10;250</strong> puis <strong>20;520</strong>
+      </div>
+
+      <label for="tankSelect">Citerne sélectionnée</label>
+      <select id="tankSelect"></select>
+
+      <div class="grid grid-2" style="margin-top:12px;">
+        <div>
+          <label for="sounding">Sonde mesurée</label>
+          <input id="sounding" type="number" inputmode="decimal" placeholder="Ex : 42.5" />
+        </div>
+
+        <div>
+          <label for="unit">Unité</label>
+          <select id="unit">
+            <option value="cm">cm</option>
+            <option value="mm">mm</option>
+          </select>
+        </div>
+      </div>
+
+      <button class="green" onclick="calculate()">Calculer les litres</button>
+
+      <div class="result" id="result">
+        <div class="small">Résultat</div>
+        <div class="liters">---</div>
+        <div class="small">Sélectionne une citerne et entre une sonde.</div>
+      </div>
+    </section>
+
+    <section class="card">
+      <h2 style="margin-top:0;">Gestion des citernes</h2>
+
+      <label for="newTankName">Nom de la citerne</label>
+      <input id="newTankName" placeholder="Ex : Gasoil bâbord" />
+
+      <button onclick="addTank()">Ajouter une citerne</button>
+
+      <div class="tank-list" id="tankList"></div>
+    </section>
+
+    <section class="card">
+      <h2 style="margin-top:0;">Table de sonde</h2>
+
+      <label for="tableData">Données de la citerne sélectionnée</label>
+      <textarea id="tableData" placeholder="0;0
+10;250
+20;520
+30;790"></textarea>
+
+      <button class="green" onclick="saveTable()">Sauvegarder la table</button>
+      <button class="secondary" onclick="sortTable()">Trier la table</button>
+      <button class="secondary" onclick="exportData()">Exporter sauvegarde</button>
+      <button class="secondary" onclick="importData()">Importer sauvegarde</button>
+      <button class="red" onclick="resetAll()">Réinitialiser tout</button>
+
+      <p class="small">
+        Les données sont enregistrées directement dans le téléphone avec le navigateur.
+        Elles restent disponibles tant que tu ne vides pas les données du site.
+      </p>
+    </section>
+  </main>
+
+  <footer>
+    Version embarquée · MY Genesia · Table de sondes gasoil
+  </footer>
+
+  <script>
+    const STORAGE_KEY = "my_genesia_fuel_sounding_v1";
+
+    let tanks = loadData();
+    let selectedTankId = tanks.length ? tanks[0].id : null;
+
+    function defaultData() {
+      return [
+        {
+          id: crypto.randomUUID ? crypto.randomUUID() : String(Date.now()),
+          name: "Gasoil bâbord",
+          table: "0;0\n10;0\n20;0\n30;0"
+        },
+        {
+          id: crypto.randomUUID ? crypto.randomUUID() : String(Date.now() + 1),
+          name: "Gasoil tribord",
+          table: "0;0\n10;0\n20;0\n30;0"
+        }
+      ];
+    }
+
+    function loadData() {
+      const saved = localStorage.getItem(STORAGE_KEY);
+      if (!saved) {
+        const data = defaultData();
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+        return data;
+      }
+
+      try {
+        return JSON.parse(saved);
+      } catch {
+        return defaultData();
+      }
+    }
+
+    function saveData() {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(tanks));
+    }
+
+    function render() {
+      const tankSelect = document.getElementById("tankSelect");
+      const tankList = document.getElementById("tankList");
+      const tableData = document.getElementById("tableData");
+
+      tankSelect.innerHTML = "";
+      tankList.innerHTML = "";
+
+      tanks.forEach(tank => {
+        const option = document.createElement("option");
+        option.value = tank.id;
+        option.textContent = tank.name;
+        tankSelect.appendChild(option);
+
+        const item = document.createElement("div");
+        item.className = "tank-item";
+
+        const left = document.createElement("div");
+        left.innerHTML = `<div class="tank-name">${escapeHtml(tank.name)}</div><div class="badge">${parseTable(tank.table).length} points</div>`;
+
+        const actions = document.createElement("div");
+        actions.className = "row-actions";
+
+        const renameBtn = document.createElement("button");
+        renameBtn.className = "secondary";
+        renameBtn.textContent = "Renommer";
+        renameBtn.onclick = () => renameTank(tank.id);
+
+        const deleteBtn = document.createElement("button");
+        deleteBtn.className = "red";
+        deleteBtn.textContent = "Suppr.";
+        deleteBtn.onclick = () => deleteTank(tank.id);
+
+        actions.appendChild(renameBtn);
+        actions.appendChild(deleteBtn);
+
+        item.appendChild(left);
+        item.appendChild(actions);
+        tankList.appendChild(item);
+      });
+
+      if (!selectedTankId && tanks.length) selectedTankId = tanks[0].id;
+
+      tankSelect.value = selectedTankId || "";
+
+      const selected = getSelectedTank();
+      tableData.value = selected ? selected.table : "";
+    }
+
+    document.getElementById("tankSelect").addEventListener("change", function () {
+      selectedTankId = this.value;
+      const selected = getSelectedTank();
+      document.getElementById("tableData").value = selected ? selected.table : "";
+      clearResult();
+    });
+
+    function getSelectedTank() {
+      return tanks.find(t => t.id === selectedTankId);
+    }
+
+    function addTank() {
+      const input = document.getElementById("newTankName");
+      const name = input.value.trim();
+
+      if (!name) {
+        alert("Entre un nom de citerne.");
+        return;
+      }
+
+      const tank = {
+        id: crypto.randomUUID ? crypto.randomUUID() : String(Date.now()),
+        name,
+        table: "0;0\n10;0\n20;0\n30;0"
+      };
+
+      tanks.push(tank);
+      selectedTankId = tank.id;
+      input.value = "";
+      saveData();
+      render();
+    }
+
+    function renameTank(id) {
+      const tank = tanks.find(t => t.id === id);
+      if (!tank) return;
+
+      const newName = prompt("Nouveau nom de citerne :", tank.name);
+      if (!newName || !newName.trim()) return;
+
+      tank.name = newName.trim();
+      saveData();
+      render();
+    }
+
+    function deleteTank(id) {
+      if (tanks.length <= 1) {
+        alert("Tu dois garder au moins une citerne.");
+        return;
+      }
+
+      if (!confirm("Supprimer cette citerne ?")) return;
+
+      tanks = tanks.filter(t => t.id !== id);
+      selectedTankId = tanks[0].id;
+      saveData();
+      render();
+      clearResult();
+    }
+
+    function saveTable() {
+      const tank = getSelectedTank();
+      if (!tank) return;
+
+      const raw = document.getElementById("tableData").value.trim();
+      const parsed = parseTable(raw);
+
+      if (parsed.length < 2) {
+        alert("Il faut au moins deux lignes valides : hauteur;litres");
+        return;
+      }
+
+      tank.table = raw;
+      saveData();
+      render();
+      alert("Table sauvegardée.");
+    }
+
+    function sortTable() {
+      const raw = document.getElementById("tableData").value;
+      const parsed = parseTable(raw);
+
+      if (parsed.length < 2) {
+        alert("Pas assez de lignes valides à trier.");
+        return;
+      }
+
+      parsed.sort((a, b) => a.height - b.height);
+
+      document.getElementById("tableData").value = parsed
+        .map(p => `${formatNumber(p.height)};${formatNumber(p.liters)}`)
+        .join("\n");
+
+      saveTable();
+    }
+
+    function parseTable(raw) {
+      return raw
+        .split(/\n+/)
+        .map(line => line.trim())
+        .filter(Boolean)
+        .map(line => {
+          const clean = line.replace(",", ".").replace(/\s+/g, "");
+          const parts = clean.split(/[;|,]/);
+
+          if (parts.length < 2) return null;
+
+          const height = Number(parts[0]);
+          const liters = Number(parts[1]);
+
+          if (!Number.isFinite(height) || !Number.isFinite(liters)) return null;
+
+          return { height, liters };
+        })
+        .filter(Boolean)
+        .sort((a, b) => a.height - b.height);
+    }
+
+    function calculate() {
+      const tank = getSelectedTank();
+      if (!tank) {
+        alert("Aucune citerne sélectionnée.");
+        return;
+      }
+
+      let sounding = Number(String(document.getElementById("sounding").value).replace(",", "."));
+      const unit = document.getElementById("unit").value;
+
+      if (!Number.isFinite(sounding)) {
+        alert("Entre une sonde valide.");
+        return;
+      }
+
+      if (unit === "mm") {
+        sounding = sounding / 10;
+      }
+
+      const table = parseTable(tank.table);
+
+      if (table.length < 2) {
+        alert("La table doit contenir au moins deux points valides.");
+        return;
+      }
+
+      const min = table[0];
+      const max = table[table.length - 1];
+
+      let liters;
+      let status = "";
+
+      if (sounding <= min.height) {
+        liters = min.liters;
+        status = "Sonde sous la première valeur de table.";
+      } else if (sounding >= max.height) {
+        liters = max.liters;
+        status = "Sonde au-dessus de la dernière valeur de table.";
+      } else {
+        for (let i = 0; i < table.length - 1; i++) {
+          const a = table[i];
+          const b = table[i + 1];
+
+          if (sounding >= a.height && sounding <= b.height) {
+            const ratio = (sounding - a.height) / (b.height - a.height);
+            liters = a.liters + ratio * (b.liters - a.liters);
+            status = `Interpolation entre ${formatNumber(a.height)} cm et ${formatNumber(b.height)} cm.`;
+            break;
+          }
+        }
+      }
+
+      showResult(tank.name, sounding, liters, status);
+    }
+
+    function showResult(tankName, soundingCm, liters, status) {
+      const result = document.getElementById("result");
+
+      result.innerHTML = `
+        <div class="small">${escapeHtml(tankName)} · sonde ${formatNumber(soundingCm)} cm</div>
+        <div class="liters">${formatNumber(liters)} L</div>
+        <div class="small">${escapeHtml(status)}</div>
+      `;
+    }
+
+    function clearResult() {
+      document.getElementById("result").innerHTML = `
+        <div class="small">Résultat</div>
+        <div class="liters">---</div>
+        <div class="small">Sélectionne une citerne et entre une sonde.</div>
+      `;
+    }
+
+    function exportData() {
+      const data = JSON.stringify(tanks, null, 2);
+      navigator.clipboard.writeText(data)
+        .then(() => alert("Sauvegarde copiée dans le presse-papiers."))
+        .catch(() => prompt("Copie cette sauvegarde :", data));
+    }
+
+    function importData() {
+      const data = prompt("Colle ici la sauvegarde exportée :");
+      if (!data) return;
+
+      try {
+        const imported = JSON.parse(data);
+
+        if (!Array.isArray(imported)) {
+          throw new Error("Format invalide");
+        }
+
+        imported.forEach(t => {
+          if (!t.id || !t.name || typeof t.table !== "string") {
+            throw new Error("Format invalide");
+          }
+        });
+
+        tanks = imported;
+        selectedTankId = tanks[0].id;
+        saveData();
+        render();
+        clearResult();
+        alert("Sauvegarde importée.");
+      } catch {
+        alert("Impossible d'importer : format invalide.");
+      }
+    }
+
+    function resetAll() {
+      if (!confirm("Tout réinitialiser ? Les tables seront supprimées.")) return;
+
+      tanks = defaultData();
+      selectedTankId = tanks[0].id;
+      saveData();
+      render();
+      clearResult();
+    }
+
+    function formatNumber(value) {
+      if (!Number.isFinite(value)) return "---";
+      return Math.round(value * 10) / 10;
+    }
+
+    function escapeHtml(text) {
+      return String(text)
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#039;");
+    }
+
+    render();
+  </script>
+</body>
+</html>
