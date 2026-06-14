@@ -6,7 +6,7 @@
 <title>MY Genesia - Tables de sonde gasoil</title>
 <style>
 body{font-family:Arial,sans-serif;background:#0f1720;color:white;margin:0;padding:14px}
-.container{max-width:720px;margin:auto;background:#172331;padding:16px;border-radius:16px}
+.container{max-width:760px;margin:auto;background:#172331;padding:16px;border-radius:16px}
 h1{text-align:center;font-size:22px;margin:5px 0}
 .sub{text-align:center;color:#aebdcc;font-size:13px;margin-bottom:15px}
 .tabs{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-bottom:15px}
@@ -21,8 +21,10 @@ button.calc{width:100%;padding:15px;margin-top:16px;border:0;border-radius:10px;
 .big{font-size:31px;color:#00e6b8;font-weight:bold}
 .med{font-size:21px;margin-top:6px}
 .warn{color:#ffcc66;margin-top:8px;font-size:14px}
-table{width:100%;border-collapse:collapse;margin-top:12px;font-size:14px}
-td,th{border-bottom:1px solid #2d3d4f;padding:8px;text-align:right}
+.danger{color:#ff6b6b;margin-top:8px;font-size:15px;font-weight:bold}
+.ok{color:#00e6b8;margin-top:8px;font-size:15px;font-weight:bold}
+table{width:100%;border-collapse:collapse;margin-top:12px;font-size:13px}
+td,th{border-bottom:1px solid #2d3d4f;padding:7px;text-align:right}
 td:first-child,th:first-child{text-align:left}
 .total{font-size:28px;color:#00e6b8;font-weight:bold}
 .small{font-size:12px;color:#aab8c5;margin-top:8px}
@@ -32,13 +34,13 @@ td:first-child,th:first-child{text-align:left}
 
 <div class="container">
 <h1>MY Genesia - Gasoil</h1>
-<div class="sub">Tables de sonde / ROB / Avitaillement / Charter</div>
+<div class="sub">Tables de sonde / ROB / Avitaillement sécurité / Charter</div>
 
 <div class="tabs">
 <button class="tab active" onclick="openTab('sonde',this)">Sonde ➜ L</button>
 <button class="tab" onclick="openTab('litres',this)">L ➜ Sonde</button>
-<button class="tab" onclick="openTab('avitail',this)">Avitaillement</button>
 <button class="tab" onclick="openTab('rob',this)">ROB</button>
+<button class="tab" onclick="openTab('bunker',this)">Avitaillement</button>
 <button class="tab" onclick="openTab('charter',this)">Charter</button>
 </div>
 
@@ -56,18 +58,20 @@ td:first-child,th:first-child{text-align:left}
 <div id="res2" class="result">Entre une quantité.</div>
 </div>
 
-<div id="avitail" class="panel">
-<label>Tank</label><select id="tank3"></select>
-<label>Niveau actuel en mm</label><input id="mm3" type="number" placeholder="Ex : 700">
-<label>Quantité à embarquer en litres</label><input id="add3" type="number" placeholder="Ex : 1500">
-<button class="calc" onclick="calcAvitail()">Calculer niveau final</button>
-<div id="res3" class="result">Entre les données.</div>
-</div>
-
 <div id="rob" class="panel">
 <div id="robInputs"></div>
 <button class="calc" onclick="calcROB()">Calculer ROB total</button>
 <div id="resRob" class="result">Entre les sondes des 5 tanks.</div>
+</div>
+
+<div id="bunker" class="panel">
+<div id="bunkerInputs"></div>
+<label>Marge sécurité souhaitée (%)</label>
+<input id="securityMargin" type="number" value="5">
+<label>Quantité prévue à embarquer en litres</label>
+<input id="bunkerQty" type="number" placeholder="Ex : 8000">
+<button class="calc" onclick="calcBunker()">Calculer avitaillement sécurisé</button>
+<div id="resBunker" class="result">Entre les sondes actuelles et la quantité prévue.</div>
 </div>
 
 <div id="charter" class="panel">
@@ -94,20 +98,25 @@ fwdPort:{name:"Fuel Fwd Port",table:fwdSide},
 fwdStbd:{name:"Fuel Fwd Stbd",table:fwdSide}
 };
 
-function fillSelects(){
-["tank1","tank2","tank3"].forEach(id=>{
+function fill(){
+["tank1","tank2"].forEach(id=>{
 let s=document.getElementById(id);
 for(let k in tanks){s.innerHTML+=`<option value="${k}">${tanks[k].name}</option>`}
 });
 let r=document.getElementById("robInputs");
-for(let k in tanks){r.innerHTML+=`<label>${tanks[k].name} - sonde en mm</label><input id="rob_${k}" type="number" placeholder="mm">`}
+let b=document.getElementById("bunkerInputs");
+for(let k in tanks){
+r.innerHTML+=`<label>${tanks[k].name} - sonde en mm</label><input id="rob_${k}" type="number" placeholder="mm">`;
+b.innerHTML+=`<label>${tanks[k].name} - sonde actuelle en mm</label><input id="bun_${k}" type="number" placeholder="mm">`;
 }
-fillSelects();
+}
+fill();
 
 function openTab(id,btn){
 document.querySelectorAll(".panel").forEach(p=>p.classList.remove("active"));
 document.querySelectorAll(".tab").forEach(t=>t.classList.remove("active"));
-document.getElementById(id).classList.add("active");btn.classList.add("active");
+document.getElementById(id).classList.add("active");
+btn.classList.add("active");
 }
 
 function interpMM(table,mm){
@@ -134,6 +143,7 @@ return {mm:a[0]+r*(b[0]-a[0]),p:a[1]+r*(b[1]-a[1]),w:""};
 }
 
 function maxL(k){return tanks[k].table.at(-1)[2]*1000}
+function safeL(k,margin){return maxL(k)*(1-margin/100)}
 
 function calcSonde(){
 let k=tank1.value,mm=parseFloat(mm1.value);
@@ -149,16 +159,6 @@ let d=interpL(tanks[k].table,l);
 res2.innerHTML=`<div class="big">${d.mm.toFixed(0)} mm</div><div class="med">${d.p.toFixed(1)} %</div>${d.w?`<div class="warn">${d.w}</div>`:""}<div class="small">${tanks[k].name}</div>`;
 }
 
-function calcAvitail(){
-let k=tank3.value,mm=parseFloat(mm3.value),add=parseFloat(add3.value);
-if(isNaN(mm)||isNaN(add)){res3.innerHTML="Données invalides";return}
-let now=interpMM(tanks[k].table,mm).l;
-let final=now+add;
-let max=maxL(k);
-let d=interpL(tanks[k].table,final);
-res3.innerHTML=`<div>Actuel : ${now.toFixed(0)} L</div><div>Ajout : ${add.toFixed(0)} L</div><div class="big">${final.toFixed(0)} L</div><div class="med">Sonde finale : ${d.mm.toFixed(0)} mm</div><div>${d.p.toFixed(1)} %</div>${final>max?`<div class="warn">Attention : dépasse capacité max de ${(final-max).toFixed(0)} L</div>`:""}`;
-}
-
 function calcROB(){
 let total=0,cap=0,rows="";
 for(let k in tanks){
@@ -169,7 +169,56 @@ total+=l;cap+=maxL(k);
 rows+=`<tr><td>${tanks[k].name}</td><td>${l.toFixed(0)} L</td><td>${p.toFixed(1)} %</td></tr>`;
 }
 let pct=total/cap*100;
-resRob.innerHTML=`<div class="total">ROB : ${total.toFixed(0)} L</div><div class="med">${pct.toFixed(1)} % global</div><div>Capacité restante : ${(cap-total).toFixed(0)} L</div><table><tr><th>Tank</th><th>Litres</th><th>%</th></tr>${rows}</table>`;
+resRob.innerHTML=`<div class="total">ROB : ${total.toFixed(0)} L</div><div class="med">${pct.toFixed(1)} % global</div><div>Capacité totale : ${cap.toFixed(0)} L</div><div>Capacité restante : ${(cap-total).toFixed(0)} L</div><table><tr><th>Tank</th><th>Litres</th><th>%</th></tr>${rows}</table>`;
+}
+
+function calcBunker(){
+let margin=parseFloat(securityMargin.value);
+let planned=parseFloat(bunkerQty.value);
+if(isNaN(margin)){margin=5}
+if(isNaN(planned)){planned=0}
+
+let total=0,capTotal=0,safeTotal=0,remain100=0,remainSafe=0,rows="";
+for(let k in tanks){
+let v=parseFloat(document.getElementById("bun_"+k).value);
+let current=0,p=0;
+if(!isNaN(v)){let d=interpMM(tanks[k].table,v);current=d.l;p=d.p}
+let cap=maxL(k);
+let safe=cap*(1-margin/100);
+let r100=Math.max(cap-current,0);
+let rSafe=Math.max(safe-current,0);
+total+=current;capTotal+=cap;safeTotal+=safe;remain100+=r100;remainSafe+=rSafe;
+
+rows+=`<tr>
+<td>${tanks[k].name}</td>
+<td>${current.toFixed(0)}</td>
+<td>${cap.toFixed(0)}</td>
+<td>${safe.toFixed(0)}</td>
+<td>${rSafe.toFixed(0)}</td>
+</tr>`;
+}
+
+let final=total+planned;
+let msg="";
+if(planned<=remainSafe){
+msg=`<div class="ok">OK : tu restes sous la limite sécurité ${100-margin}%.</div>`;
+}else if(planned<=remain100){
+msg=`<div class="warn">Attention : tu dépasses la marge sécurité de ${(planned-remainSafe).toFixed(0)} L.</div>`;
+}else{
+msg=`<div class="danger">RISQUE DÉBORDEMENT : dépassement capacité max de ${(planned-remain100).toFixed(0)} L.</div>`;
+}
+
+resBunker.innerHTML=`
+<div class="total">ROB actuel : ${total.toFixed(0)} L</div>
+<div class="med">Max embarquable sécurité : ${remainSafe.toFixed(0)} L</div>
+<div>Max avant plein théorique : ${remain100.toFixed(0)} L</div>
+<div>ROB final prévu : ${final.toFixed(0)} L</div>
+${msg}
+<table>
+<tr><th>Tank</th><th>Actuel L</th><th>100%</th><th>${100-margin}%</th><th>Reste sécurité</th></tr>
+${rows}
+</table>
+<div class="small">Marge sécurité réglée à ${margin}% sous capacité max.</div>`;
 }
 
 function calcCharter(){
