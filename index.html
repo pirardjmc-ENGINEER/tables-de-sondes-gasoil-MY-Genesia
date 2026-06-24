@@ -9,116 +9,76 @@ body{font-family:Arial,sans-serif;background:#0f1720;color:white;margin:0;paddin
 .container{max-width:860px;margin:auto;background:#172331;padding:16px;border-radius:16px}
 h1{text-align:center;font-size:22px;margin:5px 0}.sub{text-align:center;color:#aebdcc;font-size:13px;margin-bottom:15px}
 .tabs{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-bottom:15px}.tab{padding:12px;border:0;border-radius:10px;background:#26384a;color:white;font-weight:bold}.tab.active{background:#00b894}
-.panel{display:none}.panel.active{display:block}label{display:block;margin-top:12px;font-weight:bold}select,input{width:100%;padding:13px;border:0;border-radius:10px;font-size:17px;box-sizing:border-box}input[readonly]{background:#d7dde3;color:#172331}
-button.calc{width:100%;padding:15px;margin-top:16px;border:0;border-radius:10px;background:#00b894;color:white;font-size:18px;font-weight:bold}.btnSmall{padding:9px 10px;border:0;border-radius:8px;background:#40566d;color:white;font-weight:bold;margin-top:8px}.btnDanger{background:#944040}.btnLine{display:flex;gap:8px;flex-wrap:wrap}
-.result{margin-top:16px;background:#0b121a;padding:16px;border-radius:12px;text-align:center}.card{background:#0b121a;border-radius:12px;padding:12px;margin-top:14px;border:1px solid #2d3d4f}.card h3{margin:0 0 8px 0;font-size:17px;color:#00e6b8}.grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px}.grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px}
+.panel{display:none}.panel.active{display:block}label{display:block;margin-top:12px;font-weight:bold;color:#e8f0f6}
+select,input{width:100%;padding:13px;border:0;border-radius:10px;font-size:17px;box-sizing:border-box}input.smallInput{padding:10px;font-size:15px}
+button.calc,button.smallBtn{width:100%;padding:15px;margin-top:16px;border:0;border-radius:10px;background:#00b894;color:white;font-size:18px;font-weight:bold}button.smallBtn{padding:10px;font-size:14px;background:#31475e;margin-top:8px}
+.result{margin-top:16px;background:#0b121a;padding:16px;border-radius:12px;text-align:center}.card{margin-top:14px;background:#0b121a;padding:14px;border-radius:12px;border:1px solid #26384a}.card h3{margin:0 0 10px 0;font-size:17px;color:#00e6b8}
 .big{font-size:31px;color:#00e6b8;font-weight:bold}.med{font-size:21px;margin-top:6px}.warn{color:#ffcc66;margin-top:8px;font-size:14px}.danger{color:#ff6b6b;margin-top:8px;font-size:15px;font-weight:bold}.ok{color:#00e6b8;margin-top:8px;font-size:15px;font-weight:bold}
-table{width:100%;border-collapse:collapse;margin-top:12px;font-size:13px}td,th{border-bottom:1px solid #2d3d4f;padding:7px;text-align:right}td:first-child,th:first-child{text-align:left}.total{font-size:28px;color:#00e6b8;font-weight:bold}.small{font-size:12px;color:#aab8c5;margin-top:8px}.muted{color:#aab8c5}.nowrap{white-space:nowrap}
-@media(max-width:650px){.grid2,.grid3{grid-template-columns:1fr}.tabs{grid-template-columns:repeat(2,1fr)}table{font-size:12px}td,th{padding:6px}}
+table{width:100%;border-collapse:collapse;margin-top:12px;font-size:13px}td,th{border-bottom:1px solid #2d3d4f;padding:7px;text-align:right}td:first-child,th:first-child{text-align:left}.total{font-size:28px;color:#00e6b8;font-weight:bold}.small{font-size:12px;color:#aab8c5;margin-top:8px}.grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px}.muted{color:#aab8c5}.pill{display:inline-block;padding:4px 8px;border-radius:20px;background:#26384a;font-size:12px;color:#cdd8e3}.topBox{background:#061017;border:1px solid #00b894;padding:14px;border-radius:14px;margin:12px 0}.topLine{display:flex;justify-content:space-between;gap:10px;border-bottom:1px solid #26384a;padding:8px 0}.topLine:last-child{border-bottom:0}.topLine span:last-child{font-weight:bold;color:#00e6b8;text-align:right}.sep{height:1px;background:#2d3d4f;margin:14px 0}
+@media(max-width:600px){.grid2{grid-template-columns:1fr}.tabs{grid-template-columns:repeat(2,1fr)}table{font-size:12px}.big{font-size:27px}}
 </style>
 </head>
 <body>
 <div class="container">
-<h1>MY Genesia - Gasoil V2.1</h1>
-<div class="sub">Tables de sonde / ROB / Avitaillement sécurité / Contrôle réel</div>
-
+<h1>MY Genesia - Gasoil</h1>
+<div class="sub">Tables de sonde / ROB / Avitaillement sécurité / Charter - V2.1</div>
 <div class="tabs">
 <button class="tab active" onclick="openTab('sonde',this)">Sonde ➜ L</button>
 <button class="tab" onclick="openTab('litres',this)">L ➜ Sonde</button>
 <button class="tab" onclick="openTab('rob',this)">ROB</button>
 <button class="tab" onclick="openTab('bunker',this)">Avitaillement</button>
-<button class="tab" onclick="openTab('params',this)">Paramètres</button>
 <button class="tab" onclick="openTab('charter',this)">Charter</button>
+<button class="tab" onclick="openTab('settings',this)">Paramètres</button>
 </div>
 
-<div id="sonde" class="panel active">
-<label>Tank</label><select id="tank1"></select>
-<label>Hauteur de sonde en mm</label><input id="mm1" type="number" placeholder="Ex : 750">
-<button class="calc" onclick="calcSonde()">Calculer</button>
-<div id="res1" class="result">Entre une hauteur.</div>
-</div>
-
-<div id="litres" class="panel">
-<label>Tank</label><select id="tank2"></select>
-<label>Litres</label><input id="l2" type="number" placeholder="Ex : 4500">
-<button class="calc" onclick="calcLitres()">Calculer</button>
-<div id="res2" class="result">Entre une quantité.</div>
-</div>
-
-<div id="rob" class="panel">
-<div id="robInputs"></div>
-<button class="calc" onclick="calcROB()">Calculer ROB total</button>
-<div id="resRob" class="result">Entre les sondes des 5 tanks.</div>
-</div>
+<div id="sonde" class="panel active"><label>Tank</label><select id="tank1"></select><label>Hauteur de sonde en mm</label><input id="mm1" type="number" placeholder="Ex : 750"><button class="calc" onclick="calcSonde()">Calculer</button><div id="res1" class="result">Entre une hauteur.</div></div>
+<div id="litres" class="panel"><label>Tank</label><select id="tank2"></select><label>Litres</label><input id="l2" type="number" placeholder="Ex : 4500"><button class="calc" onclick="calcLitres()">Calculer</button><div id="res2" class="result">Entre une quantité.</div></div>
+<div id="rob" class="panel"><div id="robInputs"></div><button class="calc" onclick="calcROB()">Calculer ROB total</button><div id="resRob" class="result">Entre les sondes des 5 tanks.</div></div>
 
 <div id="bunker" class="panel">
-<div class="small">Saisis les sondes actuelles en mm, puis les litres que tu prévois d'envoyer par tank. Le rapport affiche litres + mm prévus + mm réels vérifiés.</div>
+<div class="small">1) Entre les sondes actuelles en mm. 2) L'appli calcule en haut le volume total commandable avec les marges par tank. 3) Tu entres ensuite la quantité souhaitée.</div>
 <div id="bunkerInputs"></div>
-<button class="calc" onclick="calcBunker()">Calculer avitaillement sécurisé</button>
-<div id="resBunker" class="result">Entre les sondes actuelles et les litres à charger.</div>
+<label>Quantité souhaitée / à commander en litres</label><input id="bunkerQty" type="number" placeholder="Ex : 8000" oninput="calcBunker(false)">
+<button class="calc" onclick="calcBunker(true)">Calculer avitaillement sécurisé</button>
+<div id="resBunker" class="result">Entre les sondes actuelles pour connaître le volume total possible.</div>
 </div>
 
-<div id="params" class="panel">
-<div class="small">Les niveaux max théoriques viennent des tables. Les niveaux max exploitation et marges sécurité sont modifiables et sauvegardés sur ce téléphone.</div>
-<div id="paramInputs"></div>
-<div class="btnLine">
-<button class="calc" onclick="saveSettings()">Enregistrer paramètres</button>
-<button class="calc btnDanger" onclick="resetAllSettings()">Réinitialiser tous les paramètres</button>
-</div>
-<div id="resParams" class="result">Paramètres prêts.</div>
-</div>
+<div id="charter" class="panel"><label>Date début charter</label><input id="dateStart" type="date"><label>ROB début en litres</label><input id="robStart" type="number" placeholder="Ex : 42000"><label>Date fin charter</label><input id="dateEnd" type="date"><label>ROB fin en litres</label><input id="robEnd" type="number" placeholder="Ex : 28500"><button class="calc" onclick="calcCharter()">Calculer consommation charter</button><div id="resCharter" class="result">Entre les ROB début et fin.</div></div>
 
-<div id="charter" class="panel">
-<label>Date début charter</label><input id="dateStart" type="date">
-<label>ROB début en litres</label><input id="robStart" type="number" placeholder="Ex : 42000">
-<label>Date fin charter</label><input id="dateEnd" type="date">
-<label>ROB fin en litres</label><input id="robEnd" type="number" placeholder="Ex : 28500">
-<button class="calc" onclick="calcCharter()">Calculer consommation charter</button>
-<div id="resCharter" class="result">Entre les ROB début et fin.</div>
-</div>
+<div id="settings" class="panel"><div class="small">Les tables constructeur restent intactes. Ici tu règles seulement l'exploitation réelle du bateau.</div><div id="settingsInputs"></div><button class="calc" onclick="saveSettings();alert('Paramètres sauvegardés')">Sauvegarder paramètres</button><button class="smallBtn" onclick="resetAllSettings()">Réinitialiser tous les tanks au théorique + marge 5%</button></div>
 </div>
 
 <script>
 const aftSide=[[50,0,0],[100,0.2,0.02],[150,0.8,0.05],[163,1,0.06],[200,1.8,0.11],[250,3.3,0.20],[300,5.4,0.33],[350,8.2,0.49],[400,11.6,0.69],[450,15.6,0.94],[500,20.4,1.22],[550,26,1.56],[600,32.4,1.94],[650,39.4,2.36],[700,47,2.81],[750,55,3.29],[800,63.2,3.78],[850,71.7,4.29],[900,80.4,4.81],[950,89.2,5.34],[999,98,5.86],[1000,98.2,5.88],[1010,100,5.98]];
 const aftCentre=[[50,0.3,0.03],[100,0.8,0.10],[110,1,0.12],[150,1.7,0.21],[200,3.1,0.37],[250,5.1,0.61],[300,7.7,0.92],[350,11,1.31],[400,14.9,1.78],[450,19.4,2.33],[500,24.4,2.92],[550,29.7,3.56],[600,35.4,4.23],[650,41.3,4.94],[700,47.4,5.67],[750,53.5,6.41],[800,59.6,7.14],[850,65.7,7.87],[900,71.8,8.60],[950,78,9.34],[1000,84.1,10.07],[1050,90.2,10.80],[1100,96.3,11.54],[1114,98,11.74],[1130,100,11.98]];
 const fwdSide=[[100,0.8,0.13],[111,1,0.17],[200,3.5,0.58],[300,7.8,1.28],[400,13,2.16],[500,19,3.14],[600,25.3,4.19],[700,32,5.29],[800,38.9,6.44],[900,46,7.62],[1000,53.4,8.84],[1100,60.9,10.08],[1200,68.5,11.35],[1300,76.4,12.65],[1400,84.3,13.96],[1500,92.3,15.29],[1570,98,16.23],[1594,100,16.56]];
-
-const tanks={
-aftPort:{name:"Fuel Aft Port",table:aftSide},
-aftStbd:{name:"Fuel Aft Stbd",table:aftSide},
-aftCentre:{name:"Fuel Aft Centre",table:aftCentre},
-fwdPort:{name:"Fuel Fwd Port",table:fwdSide},
-fwdStbd:{name:"Fuel Fwd Stbd",table:fwdSide}
-};
-const STORAGE_KEY="genesia_sonde_v21_settings";
-
-function theoMaxMM(k){return tanks[k].table.at(-1)[0]}
-function theoMaxL(k){return tanks[k].table.at(-1)[2]*1000}
-function defaultSettings(){let s={};for(let k in tanks){s[k]={maxMM:theoMaxMM(k),margin:5,lastVerifiedMM:""}}return s}
-function loadSettings(){try{let saved=JSON.parse(localStorage.getItem(STORAGE_KEY));let def=defaultSettings();for(let k in def){if(!saved||!saved[k])saved=def;def[k].maxMM=parseFloat(saved[k].maxMM)||theoMaxMM(k);def[k].margin=parseFloat(saved[k].margin);if(isNaN(def[k].margin))def[k].margin=5;def[k].lastVerifiedMM=saved[k].lastVerifiedMM||""}return def}catch(e){return defaultSettings()}}
-let settings=loadSettings();
-function saveSettings(){for(let k in tanks){let max=parseFloat(document.getElementById("set_max_"+k).value);let mar=parseFloat(document.getElementById("set_margin_"+k).value);if(isNaN(max)||max<=0)max=theoMaxMM(k);if(max>theoMaxMM(k))max=theoMaxMM(k);if(isNaN(mar)||mar<0)mar=0;if(mar>50)mar=50;settings[k].maxMM=max;settings[k].margin=mar}localStorage.setItem(STORAGE_KEY,JSON.stringify(settings));buildParams();resParams.innerHTML='<div class="ok">Paramètres enregistrés.</div>';}
-function resetOne(k){document.getElementById("set_max_"+k).value=theoMaxMM(k);document.getElementById("set_margin_"+k).value=5;saveSettings()}
-function resetAllSettings(){if(!confirm("Réinitialiser tous les niveaux max exploitation et marges ?"))return;settings=defaultSettings();localStorage.setItem(STORAGE_KEY,JSON.stringify(settings));buildParams();resParams.innerHTML='<div class="ok">Tous les paramètres sont réinitialisés.</div>';}
-function exploMaxMM(k){return parseFloat(settings[k].maxMM)||theoMaxMM(k)}
-function exploMaxL(k){return interpMM(tanks[k].table,exploMaxMM(k)).l}
-function safeLimitL(k){return exploMaxL(k)*(1-(parseFloat(settings[k].margin)||0)/100)}
-
-function fill(){["tank1","tank2"].forEach(id=>{let s=document.getElementById(id);s.innerHTML="";for(let k in tanks){s.innerHTML+=`<option value="${k}">${tanks[k].name}</option>`}});let r=document.getElementById("robInputs");let b=document.getElementById("bunkerInputs");r.innerHTML="";b.innerHTML="";for(let k in tanks){r.innerHTML+=`<label>${tanks[k].name} - sonde en mm</label><input id="rob_${k}" type="number" placeholder="mm">`;b.innerHTML+=`<div class="card"><h3>${tanks[k].name}</h3><div class="grid3"><div><label>Sonde actuelle mm</label><input id="bun_${k}" type="number" placeholder="mm"></div><div><label>Litres à charger</label><input id="add_${k}" type="number" placeholder="L" value="0"></div><div><label>mm réel vérifié</label><input id="ver_${k}" type="number" placeholder="après bunkering" value="${settings[k].lastVerifiedMM||""}"></div></div></div>`;}}
-function buildParams(){settings=loadSettings();let p=document.getElementById("paramInputs");p.innerHTML="";for(let k in tanks){let theoMM=theoMaxMM(k),theoL=theoMaxL(k);let exMM=exploMaxMM(k),exL=interpMM(tanks[k].table,exMM).l;let margin=settings[k].margin;let safe=exL*(1-margin/100);p.innerHTML+=`<div class="card"><h3>${tanks[k].name}</h3><div class="grid2"><div><label>Max théorique mm</label><input readonly value="${theoMM.toFixed(0)} mm"></div><div><label>Capacité théorique</label><input readonly value="${theoL.toFixed(0)} L"></div><div><label>Max exploitation mm</label><input id="set_max_${k}" type="number" value="${exMM.toFixed(0)}"></div><div><label>Marge sécurité %</label><input id="set_margin_${k}" type="number" value="${margin}"></div><div><label>Capacité exploitation</label><input readonly value="${exL.toFixed(0)} L"></div><div><label>Limite sécurité</label><input readonly value="${safe.toFixed(0)} L"></div></div><button class="btnSmall" onclick="resetOne('${k}')">Réinitialiser ce tank</button></div>`;}}
-fill();buildParams();
-
-function openTab(id,btn){document.querySelectorAll(".panel").forEach(p=>p.classList.remove("active"));document.querySelectorAll(".tab").forEach(t=>t.classList.remove("active"));document.getElementById(id).classList.add("active");btn.classList.add("active");if(id==='params')buildParams();}
-function interpMM(table,mm){if(mm<=table[0][0])return {p:table[0][1],l:table[0][2]*1000,w:"Valeur sous minimum table"};if(mm>=table.at(-1)[0])return {p:table.at(-1)[1],l:table.at(-1)[2]*1000,w:"Valeur au-dessus maximum table"};for(let i=0;i<table.length-1;i++){let a=table[i],b=table[i+1];if(mm>=a[0]&&mm<=b[0]){let r=(mm-a[0])/(b[0]-a[0]);return {p:a[1]+r*(b[1]-a[1]),l:(a[2]+r*(b[2]-a[2]))*1000,w:""};}}}
-function interpL(table,l){let arr=table.map(x=>[x[0],x[1],x[2]*1000]);if(l<=arr[0][2])return {mm:arr[0][0],p:arr[0][1],w:"Litres sous minimum table"};if(l>=arr.at(-1)[2])return {mm:arr.at(-1)[0],p:arr.at(-1)[1],w:"Litres au-dessus capacité max"};for(let i=0;i<arr.length-1;i++){let a=arr[i],b=arr[i+1];if(l>=a[2]&&l<=b[2]){let r=(l-a[2])/(b[2]-a[2]);return {mm:a[0]+r*(b[0]-a[0]),p:a[1]+r*(b[1]-a[1]),w:""};}}}
-function diffClass(v){let a=Math.abs(v);if(a<=5)return "ok";if(a<=15)return "warn";return "danger"}
-
-function calcSonde(){let k=tank1.value,mm=parseFloat(mm1.value);if(isNaN(mm)){res1.innerHTML="Hauteur invalide";return}let d=interpMM(tanks[k].table,mm);let max=exploMaxMM(k);let extra=mm>max?`<div class="danger">Au-dessus du max exploitation réglé : ${max.toFixed(0)} mm</div>`:"";res1.innerHTML=`<div class="big">${d.l.toFixed(0)} L</div><div class="med">${d.p.toFixed(1)} %</div>${d.w?`<div class="warn">${d.w}</div>`:""}${extra}<div class="small">${tanks[k].name}</div>`;}
-function calcLitres(){let k=tank2.value,l=parseFloat(l2.value);if(isNaN(l)){res2.innerHTML="Litres invalides";return}let d=interpL(tanks[k].table,l);let extra=l>exploMaxL(k)?`<div class="danger">Au-dessus capacité exploitation réglée : ${exploMaxL(k).toFixed(0)} L / ${exploMaxMM(k).toFixed(0)} mm</div>`:"";res2.innerHTML=`<div class="big">${d.mm.toFixed(0)} mm</div><div class="med">${d.p.toFixed(1)} %</div>${d.w?`<div class="warn">${d.w}</div>`:""}${extra}<div class="small">${tanks[k].name}</div>`;}
-function calcROB(){let total=0,cap=0,safeCap=0,rows="";for(let k in tanks){let v=parseFloat(document.getElementById("rob_"+k).value);let l=0,p=0,w="";if(!isNaN(v)){let d=interpMM(tanks[k].table,v);l=d.l;p=d.p;w=d.w}total+=l;cap+=exploMaxL(k);safeCap+=safeLimitL(k);rows+=`<tr><td>${tanks[k].name}</td><td>${isNaN(v)?"-":v.toFixed(0)} mm</td><td>${l.toFixed(0)} L</td><td>${p.toFixed(1)} %</td><td>${exploMaxL(k).toFixed(0)} L</td></tr>`;}let pct=total/cap*100;resRob.innerHTML=`<div class="total">ROB : ${total.toFixed(0)} L</div><div class="med">${pct.toFixed(1)} % sur capacité exploitation</div><div>Capacité exploitation totale : ${cap.toFixed(0)} L</div><div>Limite sécurité totale : ${safeCap.toFixed(0)} L</div><div>Restant avant sécurité : ${Math.max(safeCap-total,0).toFixed(0)} L</div><div>Restant avant max exploitation : ${Math.max(cap-total,0).toFixed(0)} L</div><table><tr><th>Tank</th><th>mm</th><th>Litres</th><th>%</th><th>Max exploit.</th></tr>${rows}</table>`;}
-function calcBunker(){settings=loadSettings();let totalBefore=0,totalAdd=0,totalFinal=0,totalSafeRemain=0,totalMaxRemain=0,rows="";for(let k in tanks){let curMM=parseFloat(document.getElementById("bun_"+k).value);let addL=parseFloat(document.getElementById("add_"+k).value);let verMM=parseFloat(document.getElementById("ver_"+k).value);if(isNaN(addL))addL=0;let curL=0,curPct=0;if(!isNaN(curMM)){let d=interpMM(tanks[k].table,curMM);curL=d.l;curPct=d.p}let finalL=curL+addL;let final=interpL(tanks[k].table,finalL);let exL=exploMaxL(k),exMM=exploMaxMM(k),safeL=safeLimitL(k),margin=settings[k].margin;let remainSafe=safeL-curL;let remainMax=exL-curL;let status=`<span class="ok">OK</span>`;if(finalL>exL)status=`<span class="danger">DÉPASSE MAX EXPLOIT.</span>`;else if(finalL>safeL)status=`<span class="warn">Dépasse marge sécurité</span>`;let check="-";if(!isNaN(verMM)){settings[k].lastVerifiedMM=verMM;let diff=verMM-final.mm;let verifiedL=interpMM(tanks[k].table,verMM).l;let diffL=verifiedL-finalL;check=`<span class="${diffClass(diff)}">${diff>=0?"+":""}${diff.toFixed(0)} mm / ${diffL>=0?"+":""}${diffL.toFixed(0)} L</span>`;}totalBefore+=curL;totalAdd+=addL;totalFinal+=finalL;totalSafeRemain+=Math.max(remainSafe,0);totalMaxRemain+=Math.max(remainMax,0);rows+=`<tr><td>${tanks[k].name}</td><td>${isNaN(curMM)?"-":curMM.toFixed(0)}</td><td>${curL.toFixed(0)}</td><td>${addL.toFixed(0)}</td><td>${finalL.toFixed(0)}</td><td>${final.mm.toFixed(0)}</td><td>${exMM.toFixed(0)} mm / ${exL.toFixed(0)} L</td><td>${margin}%</td><td>${Math.max(remainSafe,0).toFixed(0)}</td><td>${check}</td><td>${status}</td></tr>`;}
-localStorage.setItem(STORAGE_KEY,JSON.stringify(settings));let msg="";let exTotal=0,safeTotal=0;for(let k in tanks){exTotal+=exploMaxL(k);safeTotal+=safeLimitL(k)}if(totalFinal>exTotal)msg=`<div class="danger">RISQUE DÉBORDEMENT / dépassement max exploitation total de ${(totalFinal-exTotal).toFixed(0)} L.</div>`;else if(totalFinal>safeTotal)msg=`<div class="warn">Attention : ROB final au-dessus de la limite sécurité globale.</div>`;else msg=`<div class="ok">OK : ROB final sous limite sécurité globale.</div>`;resBunker.innerHTML=`<div class="total">ROB actuel : ${totalBefore.toFixed(0)} L</div><div class="med">À charger : ${totalAdd.toFixed(0)} L</div><div>ROB final prévu : ${totalFinal.toFixed(0)} L</div><div>Reste sécurité actuel : ${totalSafeRemain.toFixed(0)} L</div><div>Reste max exploitation actuel : ${totalMaxRemain.toFixed(0)} L</div>${msg}<table><tr><th>Tank</th><th>mm départ</th><th>L départ</th><th>L ajoutés</th><th>L final</th><th>mm prévu</th><th>Max exploit.</th><th>Marge</th><th>Reste sécu</th><th>Écart réel</th><th>Statut</th></tr>${rows}</table><div class="small">Écart réel = mm vérifié après bunkering - mm prévu par interpolation.</div>`;}
-function calcCharter(){let s=parseFloat(robStart.value),e=parseFloat(robEnd.value);if(isNaN(s)||isNaN(e)){resCharter.innerHTML="ROB invalide";return}let conso=s-e;let days="";if(dateStart.value&&dateEnd.value){let d1=new Date(dateStart.value),d2=new Date(dateEnd.value);let diff=(d2-d1)/(1000*3600*24);if(diff>0)days=`<div>Durée : ${diff.toFixed(1)} jours</div><div>Conso moyenne : ${(conso/diff).toFixed(0)} L/jour</div>`;}resCharter.innerHTML=`<div class="big">${conso.toFixed(0)} L</div><div class="med">Consommation totale charter</div>${days}<div class="small">Calcul : ROB début - ROB fin</div>`;}
+const tanks={aftPort:{name:"Fuel Aft Port",table:aftSide},aftStbd:{name:"Fuel Aft Stbd",table:aftSide},aftCentre:{name:"Fuel Aft Centre",table:aftCentre},fwdPort:{name:"Fuel Fwd Port",table:fwdSide},fwdStbd:{name:"Fuel Fwd Stbd",table:fwdSide}};
+let tankSettings={};
+function last(table){return table[table.length-1]}
+function fmt(n){return isFinite(n)?Math.round(n).toLocaleString('fr-FR'):"0"}
+function fmt1(n){return isFinite(n)?n.toFixed(1).replace('.',','):"0,0"}
+function theoreticalMaxMM(k){return last(tanks[k].table)[0]}
+function loadSettings(){try{tankSettings=JSON.parse(localStorage.getItem('genesia_v21_settings')||'{}')}catch(e){tankSettings={}}
+for(let k in tanks){if(!tankSettings[k])tankSettings[k]={};if(!tankSettings[k].maxMM) tankSettings[k].maxMM=theoreticalMaxMM(k);if(tankSettings[k].margin===undefined) tankSettings[k].margin=5;}}
+function saveSettings(){for(let k in tanks){let max=document.getElementById('set_max_'+k),mar=document.getElementById('set_mar_'+k);if(max) tankSettings[k].maxMM=parseFloat(max.value)||theoreticalMaxMM(k);if(mar) tankSettings[k].margin=parseFloat(mar.value);if(isNaN(tankSettings[k].margin))tankSettings[k].margin=5;}localStorage.setItem('genesia_v21_settings',JSON.stringify(tankSettings));renderSettings();calcBunker(false)}
+function resetOne(k){tankSettings[k]={maxMM:theoreticalMaxMM(k),margin:5};localStorage.setItem('genesia_v21_settings',JSON.stringify(tankSettings));renderSettings();calcBunker(false)}
+function resetAllSettings(){if(!confirm('Réinitialiser tous les paramètres ?'))return;for(let k in tanks)tankSettings[k]={maxMM:theoreticalMaxMM(k),margin:5};localStorage.setItem('genesia_v21_settings',JSON.stringify(tankSettings));renderSettings();calcBunker(false)}
+function fill(){["tank1","tank2"].forEach(id=>{let s=document.getElementById(id);s.innerHTML='';for(let k in tanks)s.innerHTML+=`<option value="${k}">${tanks[k].name}</option>`});let r=document.getElementById("robInputs"),b=document.getElementById("bunkerInputs");r.innerHTML='';b.innerHTML='';for(let k in tanks){r.innerHTML+=`<label>${tanks[k].name} - sonde en mm</label><input id="rob_${k}" type="number" placeholder="mm">`;b.innerHTML+=`<div class="card"><h3>${tanks[k].name}</h3><label>Sonde actuelle en mm</label><input id="bun_${k}" type="number" placeholder="mm" oninput="calcBunker(false)"><div class="grid2"><div><label>Litres réellement mis dans ce tank</label><input id="real_l_${k}" type="number" placeholder="optionnel" oninput="calcBunker(false)"></div><div><label>Sonde réelle vérifiée après bunkering</label><input id="real_mm_${k}" type="number" placeholder="optionnel" oninput="calcBunker(false)"></div></div></div>`}}
+function renderSettings(){let s=document.getElementById('settingsInputs');s.innerHTML='';for(let k in tanks){let th=theoreticalMaxMM(k), thL=interpMM(tanks[k].table,th).l, exMM=tankSettings[k].maxMM, exL=interpMM(tanks[k].table,exMM).l;let margin=tankSettings[k].margin;s.innerHTML+=`<div class="card"><h3>${tanks[k].name}</h3><div class="topLine"><span>Niveau max théorique</span><span>${th} mm / ${fmt(thL)} L</span></div><label>Niveau max exploitation modifiable en mm</label><input id="set_max_${k}" type="number" value="${exMM}" onchange="saveSettings()"><div class="small">Capacité exploitation actuelle : <b>${fmt(exL)} L</b></div><label>Marge sécurité pour ce tank (%)</label><input id="set_mar_${k}" type="number" value="${margin}" onchange="saveSettings()"><button class="smallBtn" onclick="resetOne('${k}')">Réinitialiser ce tank</button></div>`}}
+function openTab(id,btn){document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));document.getElementById(id).classList.add('active');btn.classList.add('active');if(id==='settings')renderSettings();if(id==='bunker')calcBunker(false)}
+function interpMM(table,mm){if(mm<=table[0][0])return {p:table[0][1],l:table[0][2]*1000,w:'Valeur sous minimum table'};if(mm>=last(table)[0])return {p:last(table)[1],l:last(table)[2]*1000,w:mm>last(table)[0]?'Valeur au-dessus maximum table':''};for(let i=0;i<table.length-1;i++){let a=table[i],b=table[i+1];if(mm>=a[0]&&mm<=b[0]){let r=(mm-a[0])/(b[0]-a[0]);return {p:a[1]+r*(b[1]-a[1]),l:(a[2]+r*(b[2]-a[2]))*1000,w:''}}}return {p:0,l:0,w:'Erreur interpolation'}}
+function interpL(table,l){let arr=table.map(x=>[x[0],x[1],x[2]*1000]);if(l<=arr[0][2])return {mm:arr[0][0],p:arr[0][1],w:'Litres sous minimum table'};if(l>=last(arr)[2])return {mm:last(arr)[0],p:last(arr)[1],w:l>last(arr)[2]?'Litres au-dessus capacité max':''};for(let i=0;i<arr.length-1;i++){let a=arr[i],b=arr[i+1];if(l>=a[2]&&l<=b[2]){let r=(l-a[2])/(b[2]-a[2]);return {mm:a[0]+r*(b[0]-a[0]),p:a[1]+r*(b[1]-a[1]),w:''}}}return {mm:0,p:0,w:'Erreur interpolation'}}
+function maxL(k){return interpMM(tanks[k].table,tankSettings[k].maxMM).l}function safeL(k){return maxL(k)*(1-(tankSettings[k].margin||0)/100)}
+function calcSonde(){let k=tank1.value,mm=parseFloat(mm1.value);if(isNaN(mm)){res1.innerHTML='Hauteur invalide';return}let d=interpMM(tanks[k].table,mm);let ex=maxL(k);let msg=d.l>ex?`<div class="danger">Au-dessus du max exploitation réglé : ${fmt(ex)} L</div>`:'';res1.innerHTML=`<div class="big">${fmt(d.l)} L</div><div class="med">${fmt1(d.p)} %</div>${d.w?`<div class="warn">${d.w}</div>`:''}${msg}<div class="small">${tanks[k].name}</div>`}
+function calcLitres(){let k=tank2.value,l=parseFloat(l2.value);if(isNaN(l)){res2.innerHTML='Litres invalides';return}let d=interpL(tanks[k].table,l);res2.innerHTML=`<div class="big">${fmt(d.mm)} mm</div><div class="med">${fmt1(d.p)} %</div>${d.w?`<div class="warn">${d.w}</div>`:''}<div class="small">${tanks[k].name}</div>`}
+function calcROB(){let total=0,cap=0,rows='';for(let k in tanks){let v=parseFloat(document.getElementById('rob_'+k).value);let l=0,p=0,w='';if(!isNaN(v)){let d=interpMM(tanks[k].table,v);l=d.l;p=d.p;w=d.w}total+=l;cap+=maxL(k);rows+=`<tr><td>${tanks[k].name}</td><td>${fmt(l)} L</td><td>${fmt1(p)} %</td><td>${w?'⚠️':''}</td></tr>`}let pct=cap?total/cap*100:0;resRob.innerHTML=`<div class="total">ROB : ${fmt(total)} L</div><div class="med">${fmt1(pct)} % exploitation</div><div>Capacité exploitation totale : ${fmt(cap)} L</div><div>Capacité restante exploitation : ${fmt(cap-total)} L</div><table><tr><th>Tank</th><th>Litres</th><th>%</th><th></th></tr>${rows}</table>`}
+function calcBunker(showEmpty){saveSettingsFromInputsSilent();let desired=parseFloat(document.getElementById('bunkerQty').value);if(isNaN(desired))desired=0;let total=0,maxTotal=0,safeTotal=0,remainSafe=0,remainAbs=0,rows='',controlRows='',hasOne=false;for(let k in tanks){let mm=parseFloat(document.getElementById('bun_'+k).value);let current=0,p=0,w='';if(!isNaN(mm)){let d=interpMM(tanks[k].table,mm);current=d.l;p=d.p;w=d.w;hasOne=true}let max=maxL(k),safe=safeL(k),rs=Math.max(safe-current,0),ra=Math.max(max-current,0),margin=tankSettings[k].margin||0;total+=current;maxTotal+=max;safeTotal+=safe;remainSafe+=rs;remainAbs+=ra;let realL=parseFloat(document.getElementById('real_l_'+k).value);let finalL=!isNaN(realL)?current+realL:current;let finalD=interpL(tanks[k].table,finalL);let realMM=parseFloat(document.getElementById('real_mm_'+k).value);let delta='';if(!isNaN(realMM)){let realD=interpMM(tanks[k].table,realMM);delta=`<div class="small">Écart contrôle : <b>${(realMM-finalD.mm).toFixed(0)} mm</b> / env. <b>${fmt(realD.l-finalL)} L</b></div>`}rows+=`<tr><td>${tanks[k].name}<br><span class="muted">Marge ${margin}%</span></td><td>${isNaN(mm)?'-':fmt(mm)+' mm'}</td><td>${fmt(current)}</td><td>${fmt(safe)}</td><td>${fmt(rs)}</td><td>${fmt(ra)}</td></tr>`;controlRows+=`<div class="card"><h3>${tanks[k].name}</h3><div class="topLine"><span>Final prévu</span><span>${fmt(finalL)} L / ${fmt(finalD.mm)} mm</span></div>${delta||'<div class="small">Renseigne “litres réellement mis” et “sonde réelle vérifiée” pour contrôler l’écart.</div>'}</div>`}
+if(!hasOne&&showEmpty){resBunker.innerHTML='Entre au moins une sonde actuelle.';return}
+let msg='';if(desired>0){if(desired<=remainSafe)msg=`<div class="ok">OK : quantité souhaitée conforme avec les marges.</div>`;else if(desired<=remainAbs)msg=`<div class="warn">Attention : tu dépasses les marges de ${fmt(desired-remainSafe)} L, mais tu restes sous le max exploitation.</div>`;else msg=`<div class="danger">DÉPASSEMENT : tu dépasses le max exploitation de ${fmt(desired-remainAbs)} L.</div>`}
+resBunker.innerHTML=`<div class="topBox"><div class="topLine"><span>ROB actuel estimé</span><span>${fmt(total)} L</span></div><div class="topLine"><span>Volume total commandable avec marges</span><span>${fmt(remainSafe)} L</span></div><div class="topLine"><span>Volume total absolu exploitation</span><span>${fmt(remainAbs)} L</span></div><div class="topLine"><span>Quantité souhaitée</span><span>${fmt(desired)} L</span></div>${msg}</div><table><tr><th>Tank</th><th>Sonde</th><th>Actuel L</th><th>Limite sécurité L</th><th>Reste sécu L</th><th>Reste absolu L</th></tr>${rows}</table><div class="sep"></div><div class="med">Contrôle fin de bunkering</div>${controlRows}<div class="small">La limite sécurité est calculée sur le niveau max exploitation réglé dans Paramètres, moins la marge propre à chaque tank.</div>`}
+function saveSettingsFromInputsSilent(){for(let k in tanks){let max=document.getElementById('set_max_'+k),mar=document.getElementById('set_mar_'+k);if(max) tankSettings[k].maxMM=parseFloat(max.value)||theoreticalMaxMM(k);if(mar){let m=parseFloat(mar.value);tankSettings[k].margin=isNaN(m)?5:m}}try{localStorage.setItem('genesia_v21_settings',JSON.stringify(tankSettings))}catch(e){}}
+function calcCharter(){let s=parseFloat(robStart.value),e=parseFloat(robEnd.value);if(isNaN(s)||isNaN(e)){resCharter.innerHTML='ROB invalide';return}let conso=s-e,days='';if(dateStart.value&&dateEnd.value){let d1=new Date(dateStart.value),d2=new Date(dateEnd.value);let diff=(d2-d1)/(1000*3600*24);if(diff>0)days=`<div>Durée : ${fmt1(diff)} jours</div><div>Conso moyenne : ${fmt(conso/diff)} L/jour</div>`}resCharter.innerHTML=`<div class="big">${fmt(conso)} L</div><div class="med">Consommation totale charter</div>${days}<div class="small">Calcul : ROB début - ROB fin</div>`}
+loadSettings();fill();renderSettings();
 </script>
 </body>
 </html>
