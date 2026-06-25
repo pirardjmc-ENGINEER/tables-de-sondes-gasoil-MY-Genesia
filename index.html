@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>MY Genesia - Tables de sonde gasoil V2.1</title>
+<title>MY Genesia - Tables de sonde gasoil V2.2 PRO</title>
 <style>
 body{font-family:Arial,sans-serif;background:#0f1720;color:white;margin:0;padding:14px}
 .container{max-width:860px;margin:auto;background:#172331;padding:16px;border-radius:16px}
@@ -21,7 +21,7 @@ table{width:100%;border-collapse:collapse;margin-top:12px;font-size:13px}td,th{b
 <body>
 <div class="container">
 <h1>MY Genesia - Gasoil</h1>
-<div class="sub">Tables de sonde / ROB / Avitaillement sécurité / Charter - V2.1</div>
+<div class="sub">Tables de sonde / ROB / Avitaillement sécurité / Charter - V2.2 PRO</div>
 <div class="tabs">
 <button class="tab active" onclick="openTab('sonde',this)">Sonde ➜ L</button>
 <button class="tab" onclick="openTab('litres',this)">L ➜ Sonde</button>
@@ -72,10 +72,44 @@ function maxL(k){return interpMM(tanks[k].table,tankSettings[k].maxMM).l}functio
 function calcSonde(){let k=tank1.value,mm=parseFloat(mm1.value);if(isNaN(mm)){res1.innerHTML='Hauteur invalide';return}let d=interpMM(tanks[k].table,mm);let ex=maxL(k);let msg=d.l>ex?`<div class="danger">Au-dessus du max exploitation réglé : ${fmt(ex)} L</div>`:'';res1.innerHTML=`<div class="big">${fmt(d.l)} L</div><div class="med">${fmt1(d.p)} %</div>${d.w?`<div class="warn">${d.w}</div>`:''}${msg}<div class="small">${tanks[k].name}</div>`}
 function calcLitres(){let k=tank2.value,l=parseFloat(l2.value);if(isNaN(l)){res2.innerHTML='Litres invalides';return}let d=interpL(tanks[k].table,l);res2.innerHTML=`<div class="big">${fmt(d.mm)} mm</div><div class="med">${fmt1(d.p)} %</div>${d.w?`<div class="warn">${d.w}</div>`:''}<div class="small">${tanks[k].name}</div>`}
 function calcROB(){let total=0,cap=0,rows='';for(let k in tanks){let v=parseFloat(document.getElementById('rob_'+k).value);let l=0,p=0,w='';if(!isNaN(v)){let d=interpMM(tanks[k].table,v);l=d.l;p=d.p;w=d.w}total+=l;cap+=maxL(k);rows+=`<tr><td>${tanks[k].name}</td><td>${fmt(l)} L</td><td>${fmt1(p)} %</td><td>${w?'⚠️':''}</td></tr>`}let pct=cap?total/cap*100:0;resRob.innerHTML=`<div class="total">ROB : ${fmt(total)} L</div><div class="med">${fmt1(pct)} % exploitation</div><div>Capacité exploitation totale : ${fmt(cap)} L</div><div>Capacité restante exploitation : ${fmt(cap-total)} L</div><table><tr><th>Tank</th><th>Litres</th><th>%</th><th></th></tr>${rows}</table>`}
-function calcBunker(showEmpty){saveSettingsFromInputsSilent();let desired=parseFloat(document.getElementById('bunkerQty').value);if(isNaN(desired))desired=0;let total=0,maxTotal=0,safeTotal=0,remainSafe=0,remainAbs=0,rows='',controlRows='',hasOne=false;for(let k in tanks){let mm=parseFloat(document.getElementById('bun_'+k).value);let current=0,p=0,w='';if(!isNaN(mm)){let d=interpMM(tanks[k].table,mm);current=d.l;p=d.p;w=d.w;hasOne=true}let max=maxL(k),safe=safeL(k),rs=Math.max(safe-current,0),ra=Math.max(max-current,0),margin=tankSettings[k].margin||0;total+=current;maxTotal+=max;safeTotal+=safe;remainSafe+=rs;remainAbs+=ra;let realL=parseFloat(document.getElementById('real_l_'+k).value);let finalL=!isNaN(realL)?current+realL:current;let finalD=interpL(tanks[k].table,finalL);let realMM=parseFloat(document.getElementById('real_mm_'+k).value);let delta='';if(!isNaN(realMM)){let realD=interpMM(tanks[k].table,realMM);delta=`<div class="small">Écart contrôle : <b>${(realMM-finalD.mm).toFixed(0)} mm</b> / env. <b>${fmt(realD.l-finalL)} L</b></div>`}rows+=`<tr><td>${tanks[k].name}<br><span class="muted">Marge ${margin}%</span></td><td>${isNaN(mm)?'-':fmt(mm)+' mm'}</td><td>${fmt(current)}</td><td>${fmt(safe)}</td><td>${fmt(rs)}</td><td>${fmt(ra)}</td></tr>`;controlRows+=`<div class="card"><h3>${tanks[k].name}</h3><div class="topLine"><span>Final prévu</span><span>${fmt(finalL)} L / ${fmt(finalD.mm)} mm</span></div>${delta||'<div class="small">Renseigne “litres réellement mis” et “sonde réelle vérifiée” pour contrôler l’écart.</div>'}</div>`}
-if(!hasOne&&showEmpty){resBunker.innerHTML='Entre au moins une sonde actuelle.';return}
-let msg='';if(desired>0){if(desired<=remainSafe)msg=`<div class="ok">OK : quantité souhaitée conforme avec les marges.</div>`;else if(desired<=remainAbs)msg=`<div class="warn">Attention : tu dépasses les marges de ${fmt(desired-remainSafe)} L, mais tu restes sous le max exploitation.</div>`;else msg=`<div class="danger">DÉPASSEMENT : tu dépasses le max exploitation de ${fmt(desired-remainAbs)} L.</div>`}
-resBunker.innerHTML=`<div class="topBox"><div class="topLine"><span>ROB actuel estimé</span><span>${fmt(total)} L</span></div><div class="topLine"><span>Volume total commandable avec marges</span><span>${fmt(remainSafe)} L</span></div><div class="topLine"><span>Volume total absolu exploitation</span><span>${fmt(remainAbs)} L</span></div><div class="topLine"><span>Quantité souhaitée</span><span>${fmt(desired)} L</span></div>${msg}</div><table><tr><th>Tank</th><th>Sonde</th><th>Actuel L</th><th>Limite sécurité L</th><th>Reste sécu L</th><th>Reste absolu L</th></tr>${rows}</table><div class="sep"></div><div class="med">Contrôle fin de bunkering</div>${controlRows}<div class="small">La limite sécurité est calculée sur le niveau max exploitation réglé dans Paramètres, moins la marge propre à chaque tank.</div>`}
+function calcBunker(showEmpty){
+ saveSettingsFromInputsSilent();
+ let desired=parseFloat(document.getElementById('bunkerQty').value);if(isNaN(desired))desired=0;
+ let total=0,remainSafe=0,remainAbs=0,totalRealLoaded=0,rows='',controlRows='',hasOne=false;
+ for(let k in tanks){
+  let mm=parseFloat(document.getElementById('bun_'+k).value);
+  let current=0,p=0,w='',startTxt='-';
+  if(!isNaN(mm)){let d=interpMM(tanks[k].table,mm);current=d.l;p=d.p;w=d.w;hasOne=true;startTxt=`${fmt(mm)} mm<br><span class="muted">${fmt(current)} L</span>`}
+  let max=maxL(k),safe=safeL(k),margin=tankSettings[k].margin||0;
+  let safeD=interpL(tanks[k].table,safe),absD=interpL(tanks[k].table,max);
+  let rs=Math.max(safe-current,0),ra=Math.max(max-current,0);
+  let realMM=parseFloat(document.getElementById('real_mm_'+k).value);
+  let realLinput=parseFloat(document.getElementById('real_l_'+k).value);
+  let realLoaded=0,realFinalL=current,realFinalMM=mm;
+  if(!isNaN(realMM)){let realD=interpMM(tanks[k].table,realMM);realFinalL=realD.l;realFinalMM=realMM;realLoaded=Math.max(realFinalL-current,0)}
+  else if(!isNaN(realLinput)){realLoaded=Math.max(realLinput,0);realFinalL=current+realLoaded;realFinalMM=interpL(tanks[k].table,realFinalL).mm}
+  total+=current;remainSafe+=rs;remainAbs+=ra;totalRealLoaded+=realLoaded;
+  let leftTank=Math.max(rs-realLoaded,0),pctTank=rs>0?Math.min(realLoaded/rs*100,999):0;
+  let tankState='';
+  if(realLoaded>rs&&realLoaded<=ra)tankState=`<div class="warn">Marge dépassée de ${fmt(realLoaded-rs)} L</div>`;
+  if(realLoaded>ra)tankState=`<div class="danger">Limite absolue dépassée de ${fmt(realLoaded-ra)} L</div>`;
+  rows+=`<tr><td>${tanks[k].name}<br><span class="muted">Marge ${margin}%</span></td><td>${startTxt}</td><td>${fmt(safe)} L<br><span class="muted">${fmt(safeD.mm)} mm</span></td><td>${fmt(rs)} L</td><td>${fmt(max)} L<br><span class="muted">${fmt(absD.mm)} mm</span></td><td>${fmt(ra)} L</td></tr>`;
+  let deltaBlock='<div class="small">Entre la sonde réelle en mm après contrôle. Les litres seront recalculés depuis la table de sonde.</div>';
+  if(!isNaN(realMM)||!isNaN(realLinput)){
+   let diffMM=realFinalMM-safeD.mm,diffL=realFinalL-safe;
+   let status=Math.abs(diffMM)<=5?'<div class="ok">🟢 Conforme / proche objectif sécurité</div>':(diffMM<0?'<div class="warn">🟡 Sous objectif sécurité</div>':'<div class="danger">🔴 Au-dessus objectif sécurité</div>');
+   deltaBlock=`<div class="topLine"><span>Déjà embarqué calculé</span><span>${fmt(realLoaded)} L</span></div><div class="topLine"><span>Reste à mettre sur objectif sécu</span><span>${fmt(leftTank)} L</span></div><div class="topLine"><span>Sonde réelle / volume réel</span><span>${fmt(realFinalMM)} mm / ${fmt(realFinalL)} L</span></div><div class="topLine"><span>Écart vs objectif sécurité</span><span>${diffMM.toFixed(0)} mm / ${fmt(diffL)} L</span></div>${status}`;
+  }
+  controlRows+=`<div class="card"><h3>${tanks[k].name}</h3><div class="topLine"><span>Départ</span><span>${isNaN(mm)?'-':fmt(mm)+' mm / '+fmt(current)+' L'}</span></div><div class="topLine"><span>Objectif sécurité</span><span>${fmt(safeD.mm)} mm / ${fmt(safe)} L</span></div><div class="topLine"><span>Objectif absolu</span><span>${fmt(absD.mm)} mm / ${fmt(max)} L</span></div><div class="topLine"><span>Prévu à mettre sécurité</span><span>${fmt(rs)} L</span></div>${deltaBlock}${tankState}<div class="small">Progression tank sur objectif sécurité : <b>${fmt1(pctTank)} %</b></div></div>`;
+ }
+ if(!hasOne&&showEmpty){resBunker.innerHTML='Entre au moins une sonde actuelle.';return}
+ let leftGlobal=desired>0?Math.max(desired-totalRealLoaded,0):0;
+ let progress=desired>0?Math.min(totalRealLoaded/desired*100,999):0;
+ let msg='';
+ if(desired>0){if(desired<=remainSafe)msg=`<div class="ok">OK : quantité souhaitée conforme avec les marges.</div>`;else if(desired<=remainAbs)msg=`<div class="warn">Attention : tu dépasses les marges de ${fmt(desired-remainSafe)} L, mais tu restes sous le max exploitation.</div>`;else msg=`<div class="danger">DÉPASSEMENT : tu dépasses le max exploitation de ${fmt(desired-remainAbs)} L.</div>`}
+ if(desired>0&&totalRealLoaded>desired)msg+=`<div class="danger">Compteur live : déjà embarqué dépasse la commande de ${fmt(totalRealLoaded-desired)} L.</div>`;
+ resBunker.innerHTML=`<div class="topBox"><div class="topLine"><span>ROB actuel estimé</span><span>${fmt(total)} L</span></div><div class="topLine"><span>Volume total commandable avec marges</span><span>${fmt(remainSafe)} L</span></div><div class="topLine"><span>Volume total absolu exploitation</span><span>${fmt(remainAbs)} L</span></div><div class="topLine"><span>Quantité commandée</span><span>${fmt(desired)} L</span></div><div class="topLine"><span>Déjà embarqué renseigné/calculé</span><span>${fmt(totalRealLoaded)} L</span></div><div class="topLine"><span>Reste à embarquer commande</span><span>${fmt(leftGlobal)} L</span></div><div class="topLine"><span>Progression commande</span><span>${fmt1(progress)} %</span></div>${msg}</div><table><tr><th>Tank</th><th>Départ</th><th>Objectif sécu</th><th>Reste sécu</th><th>Objectif absolu</th><th>Reste absolu</th></tr>${rows}</table><div class="sep"></div><div class="med">Suivi / contrôle par sonde manuelle</div>${controlRows}<div class="small">La sonde réelle en mm est la référence principale. Le champ litres réellement mis reste optionnel si tu veux suivre le compteur camion/barge.</div>`;
+}
 function saveSettingsFromInputsSilent(){for(let k in tanks){let max=document.getElementById('set_max_'+k),mar=document.getElementById('set_mar_'+k);if(max) tankSettings[k].maxMM=parseFloat(max.value)||theoreticalMaxMM(k);if(mar){let m=parseFloat(mar.value);tankSettings[k].margin=isNaN(m)?5:m}}try{localStorage.setItem('genesia_v21_settings',JSON.stringify(tankSettings))}catch(e){}}
 function calcCharter(){let s=parseFloat(robStart.value),e=parseFloat(robEnd.value);if(isNaN(s)||isNaN(e)){resCharter.innerHTML='ROB invalide';return}let conso=s-e,days='';if(dateStart.value&&dateEnd.value){let d1=new Date(dateStart.value),d2=new Date(dateEnd.value);let diff=(d2-d1)/(1000*3600*24);if(diff>0)days=`<div>Durée : ${fmt1(diff)} jours</div><div>Conso moyenne : ${fmt(conso/diff)} L/jour</div>`}resCharter.innerHTML=`<div class="big">${fmt(conso)} L</div><div class="med">Consommation totale charter</div>${days}<div class="small">Calcul : ROB début - ROB fin</div>`}
 loadSettings();fill();renderSettings();
